@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "mkdir -p ./uploads && chmod -R 777 ./uploads && node app.js",
+    "start": "chmod -R 777 ./uploads && node app.js",
     "dev": "nodemon app.js"
   },
   "keywords": [],
