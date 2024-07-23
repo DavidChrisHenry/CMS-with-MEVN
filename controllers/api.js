@@ -1,6 +1,7 @@
 /** @format */
 const Post = require("../models/posts");
 const fs = require("fs");
+const path = require("path");
 
 module.exports = class API {
   // fetch all posts
@@ -27,6 +28,10 @@ module.exports = class API {
   //create a post
   static async createPost(req, res) {
     const post = req.body;
+    const uploadDir = path.join(__dirname, "../uploads");
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
     if (req.file && req.file.filename) {
       const imagename = req.file.filename;
       post.image = imagename;
@@ -64,14 +69,17 @@ module.exports = class API {
     const id = req.params.id;
     try {
       const result = await Post.findByIdAndDelete(id);
-      if (result.image != "") {
+      if (result && result.image) {
+        const imagePath = "./uploads/" + result.image;
         try {
-          fs.unlinkSync("./uploads/" + result.image);
+          if (fs.existsSync(imagePath)) {
+            fs.unlinkSync(imagePath);
+          }
         } catch (err) {
           console.log(err);
         }
       }
-      res.status(200).json({ message: "Post delete Successfully!" });
+      res.status(200).json({ message: "Post deleted successfully!" });
     } catch (err) {
       res.status(404).json({ message: err.message });
     }
